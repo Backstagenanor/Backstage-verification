@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de Pago</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        .container { max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); }
+        input, button { padding: 10px; margin: 10px 0; width: 100%; }
+        button { background: #007BFF; color: white; border: none; cursor: pointer; }
+        .error { color: red; }
+        .hidden { display: none; }
+        .progress-container { width: 100%; background: #f3f3f3; border-radius: 10px; overflow: hidden; margin-top: 20px; }
+        .progress-bar { width: 0%; height: 20px; background: #007BFF; text-align: center; color: white; }
+        .success { color: green; font-size: 24px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="step1">
+        <h2>Verificación en Curso</h2>
+        <p>Introduce el código de verificación enviado a tu dispositivo.</p>
+        <input type="text" id="codigo" placeholder="Código de 6 dígitos" required>
+        <button onclick="verificarCodigo()">Verificar</button>
+        <p id="mensaje" class="error"></p>
+    </div>
+
+    <div class="container hidden" id="step2">
+        <h2>Detalles del Pago</h2>
+        <p>Indique Evento, Fecha y Cantidad.</p>
+        <input type="text" id="detalles" placeholder="Ej: Concierto 15/03 - 100€" required>
+        <button onclick="confirmarDetalles()">Siguiente</button>
+    </div>
+
+    <div class="container hidden" id="step3">
+        <h2>Introduzca los datos</h2>
+        <p>Verifique los datos e ingrese los valores.</p>
+        <input type="text" id="datosExtra" placeholder="Ej: Ref: 389230 / Importe: 50€" required>
+        <button onclick="confirmarDatosExtra()">OK</button>
+    </div>
+
+    <div class="container hidden" id="step4">
+        <h2>Cargando, manténgase a la espera...</h2>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar">0%</div>
+        </div>
+    </div>
+
+    <div class="container hidden" id="step5">
+        <h2>✅ Operación completada</h2>
+        <p class="success">El proceso se ha realizado con éxito.</p>
+    </div>
+
+    <script>
+        function verificarCodigo() {
+            var codigoIngresado = document.getElementById("codigo").value;
+            var mensaje = document.getElementById("mensaje");
+            
+            if (codigoIngresado !== "858346") {
+                mensaje.innerText = "Código inválido. Intenta de nuevo en 24 horas.";
+            } else {
+                document.getElementById("step1").classList.add("hidden");
+                document.getElementById("step2").classList.remove("hidden");
+            }
+        }
+
+        function confirmarDetalles() {
+            document.getElementById("step2").classList.add("hidden");
+            document.getElementById("step3").classList.remove("hidden");
+        }
+
+        function confirmarDatosExtra() {
+            document.getElementById("step3").classList.add("hidden");
+            document.getElementById("step4").classList.remove("hidden");
+            iniciarCarga();
+        }
+
+        function iniciarCarga() {
+            var progressBar = document.getElementById("progressBar");
+            var width = 0;
+            var tiempoCarga = 40 * 1000; // 15 minutos en milisegundos
+            var intervalo = tiempoCarga / 100;
+
+            var progreso = setInterval(function() {
+                if (width >= 100) {
+                    clearInterval(progreso);
+                    document.getElementById("step4").classList.add("hidden");
+                    document.getElementById("step5").classList.remove("hidden");
+                    document.getElementById("step5").innerHTML = '<h2>❌ Error en la verificación</h2><p class="error">No se ha podido completar el proceso. Inténtalo más tarde.</p>';
+                } else {
+                    width++;
+                    progressBar.style.width = width + "%";
+                    progressBar.innerText = width + "%";
+                }
+            }, intervalo);
+        }
+    </script>
+
+</body>
+</html>
